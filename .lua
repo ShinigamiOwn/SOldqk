@@ -1376,7 +1376,6 @@ function Library:CreateWindow(Settings)
         Padding = UDim.new(0, 12)
     })
 
-
     function Library:Notify(Config)
         local Title = Config.Title or "Notification"
         local Content = Config.Content or "Message"
