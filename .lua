@@ -1393,18 +1393,15 @@ function Library:CreateWindow(Settings)
             Parent = NotifContainer,
             Size = UDim2.new(1, 0, 0, 0),
             BackgroundTransparency = 1,
-            ClipsDescendants = false 
         })
         
         local Frame = Create("Frame", {
             Parent = NotifHolder,
-            Size = UDim2.fromScale(1, 1),
-            BackgroundColor3 = SelectedTheme.Main,
-            BackgroundTransparency = 0.15,
+            Size = UDim2.new(1, 1, 1, 1),
+            BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+            BackgroundTransparency = 0,
             BorderSizePixel = 0,
-            ZIndex = 10001,
             ClipsDescendants = true,
-            ThemeTag = "Main"
         })
         
         local Icon = Create("ImageLabel", {
@@ -1412,12 +1409,9 @@ function Library:CreateWindow(Settings)
             Size = UDim2.new(0, 38, 0, 38),
             Position = UDim2.new(0, 12, 0, 12),
             BackgroundTransparency = 1,
+            Image = ImageUrl,
             ImageColor3 = Color3.fromRGB(255, 255, 255),
-            ZIndex = 10002,
-            ImageTransparency = 0,
-            Rotation = 0
         })
-        SetImageAsync(Icon, "Image", ImageUrl)
         
         local TitleLabel = Create("TextLabel", {
             Parent = Frame,
@@ -1429,35 +1423,28 @@ function Library:CreateWindow(Settings)
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 15,
             TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 10002,
-            TextTransparency = 0,
-            ThemeTag = "Text"
         })
         
         local ContentLabel = Create("TextLabel", {
             Parent = Frame,
-            Size = UDim2.new(1, -64, 1, -34),
+            Size = UDim2.new(1, -64, 0, ContentSize.Y),
             Position = UDim2.new(0, 60, 0, 34),
             BackgroundTransparency = 1,
             Text = Content,
             Font = Library.GlobalFont,
-            TextColor3 = Color3.fromRGB(200, 200, 200),
+            TextColor3 = Color3.fromRGB(180, 180, 180),
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
-            ZIndex = 10002,
             TextWrapped = true,
-            TextTransparency = 0
         })
 
         local BarBg = Create("Frame", {
             Parent = Frame,
             Size = UDim2.new(1, -28, 0, 3),
             Position = UDim2.new(0, 14, 1, -8),
-            BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
             BorderSizePixel = 0,
-            ZIndex = 10002,
-            BackgroundTransparency = 0.5
         })
         
         local Bar = Create("Frame", {
@@ -1465,32 +1452,15 @@ function Library:CreateWindow(Settings)
             Size = UDim2.new(1, 0, 1, 0),
             BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             BorderSizePixel = 0,
-            ZIndex = 10003,
-            BackgroundTransparency = 0
         })
         
-        local InInfo = TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-        local LinearInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-        
-        TS:Create(NotifHolder, InInfo, {Size = UDim2.new(1, 0, 0, TotalHeight)}):Play()
-        TS:Create(Frame, LinearInfo, {BackgroundTransparency = 0.15}):Play()
-        TS:Create(TitleLabel, LinearInfo, {TextTransparency = 0}):Play()
-        TS:Create(ContentLabel, LinearInfo, {TextTransparency = 0}):Play()
+        NotifHolder.Size = UDim2.new(1, 0, 0, TotalHeight)
         
         local TimerTween = TS:Create(Bar, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
         TimerTween:Play()
         
         TimerTween.Completed:Connect(function()
-            local OutInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
-            TS:Create(NotifHolder, OutInfo, {Size = UDim2.new(1, 0, 0, 0)}):Play()
-            TS:Create(Frame, OutInfo, {BackgroundTransparency = 1}):Play()
-            TS:Create(TitleLabel, OutInfo, {TextTransparency = 1}):Play()
-            TS:Create(ContentLabel, OutInfo, {TextTransparency = 1}):Play()
-            TS:Create(BarBg, OutInfo, {BackgroundTransparency = 1}):Play()
-            TS:Create(Bar, OutInfo, {BackgroundTransparency = 1}):Play()
-            task.delay(0.5, function()
-                NotifHolder:Destroy()
-            end)
+            NotifHolder:Destroy()
         end)
     end
 
