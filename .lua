@@ -1376,6 +1376,7 @@ function Library:CreateWindow(Settings)
         Padding = UDim.new(0, 12)
     })
 
+
     function Library:Notify(Config)
         local Title = Config.Title or "Notification"
         local Content = Config.Content or "Message"
@@ -1386,7 +1387,6 @@ function Library:CreateWindow(Settings)
         end
         
         local ImageUrl = Config.ImageID or "rbxassetid://3944703587"
-
         local ContentSize = TxtS:GetTextSize(Content, 13, Library.GlobalFont, Vector2.new(230, 1000))
         local TotalHeight = math.max(70, 55 + ContentSize.Y)
 
@@ -1401,28 +1401,22 @@ function Library:CreateWindow(Settings)
             Parent = NotifHolder,
             Size = UDim2.fromScale(1, 1),
             BackgroundColor3 = SelectedTheme.Main,
-            BackgroundTransparency = 0,
+            BackgroundTransparency = 0.15,
+            BorderSizePixel = 0,
             ZIndex = 10001,
             ClipsDescendants = true,
             ThemeTag = "Main"
         })
-        AddCorner(Frame, 5)
-        
-        local Stroke = AddStroke(Frame, SelectedTheme)
-        Stroke.Transparency = 1 
-
-        local Shadow = CreateDropShadow(NotifHolder, 45, 0)
-        Shadow.ImageTransparency = 1
         
         local Icon = Create("ImageLabel", {
             Parent = Frame,
-            Size = UDim2.new(0, 0, 0, 0),
-            Position = UDim2.new(0, 31, 0, 31),
+            Size = UDim2.new(0, 38, 0, 38),
+            Position = UDim2.new(0, 12, 0, 12),
             BackgroundTransparency = 1,
             ImageColor3 = Color3.fromRGB(255, 255, 255),
             ZIndex = 10002,
-            ImageTransparency = 1,
-            Rotation = -15
+            ImageTransparency = 0,
+            Rotation = 0
         })
         SetImageAsync(Icon, "Image", ImageUrl)
         
@@ -1433,11 +1427,11 @@ function Library:CreateWindow(Settings)
             BackgroundTransparency = 1,
             Text = Title,
             Font = Library.GlobalFontBold,
-            TextColor3 = SelectedTheme.Text,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 15,
             TextXAlignment = Enum.TextXAlignment.Left,
             ZIndex = 10002,
-            TextTransparency = 1,
+            TextTransparency = 0,
             ThemeTag = "Text"
         })
         
@@ -1448,51 +1442,41 @@ function Library:CreateWindow(Settings)
             BackgroundTransparency = 1,
             Text = Content,
             Font = Library.GlobalFont,
-            TextColor3 = SelectedTheme.TextDark,
+            TextColor3 = Color3.fromRGB(200, 200, 200),
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
             ZIndex = 10002,
             TextWrapped = true,
-            TextTransparency = 1,
-            ThemeTag = "TextDark"
+            TextTransparency = 0
         })
 
         local BarBg = Create("Frame", {
             Parent = Frame,
             Size = UDim2.new(1, -28, 0, 3),
             Position = UDim2.new(0, 14, 1, -8),
-            BackgroundColor3 = SelectedTheme.Second,
+            BackgroundColor3 = Color3.fromRGB(60, 60, 60),
             BorderSizePixel = 0,
             ZIndex = 10002,
-            BackgroundTransparency = 1,
-            ThemeTag = "Second"
+            BackgroundTransparency = 0.5
         })
-        AddCorner(BarBg, 3)
         
         local Bar = Create("Frame", {
             Parent = BarBg,
             Size = UDim2.new(1, 0, 1, 0),
-            BackgroundColor3 = SelectedTheme.ElementAccent,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             BorderSizePixel = 0,
             ZIndex = 10003,
-            BackgroundTransparency = 1,
-            ThemeTag = "ElementAccent"
+            BackgroundTransparency = 0
         })
-        AddCorner(Bar, 3)
         
         local InInfo = TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
         local LinearInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
         
         TS:Create(NotifHolder, InInfo, {Size = UDim2.new(1, 0, 0, TotalHeight)}):Play()
         TS:Create(Frame, LinearInfo, {BackgroundTransparency = 0.15}):Play()
-        TS:Create(Stroke, LinearInfo, {Transparency = 0.4}):Play()
-        TS:Create(Shadow, LinearInfo, {ImageTransparency = 0.35}):Play()
-        TS:Create(Icon, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 38, 0, 38), Position = UDim2.new(0, 12, 0, 12), ImageTransparency = 0, Rotation = 0}):Play()
         TS:Create(TitleLabel, LinearInfo, {TextTransparency = 0}):Play()
         TS:Create(ContentLabel, LinearInfo, {TextTransparency = 0}):Play()
-        TS:Create(BarBg, LinearInfo, {BackgroundTransparency = 0.5}):Play()
-        TS:Create(Bar, LinearInfo, {BackgroundTransparency = 0}):Play()
         
         local TimerTween = TS:Create(Bar, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
         TimerTween:Play()
@@ -1501,9 +1485,6 @@ function Library:CreateWindow(Settings)
             local OutInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
             TS:Create(NotifHolder, OutInfo, {Size = UDim2.new(1, 0, 0, 0)}):Play()
             TS:Create(Frame, OutInfo, {BackgroundTransparency = 1}):Play()
-            TS:Create(Stroke, OutInfo, {Transparency = 1}):Play()
-            TS:Create(Shadow, OutInfo, {ImageTransparency = 1}):Play()
-            TS:Create(Icon, OutInfo, {ImageTransparency = 1, Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0, 31, 0, 31)}):Play()
             TS:Create(TitleLabel, OutInfo, {TextTransparency = 1}):Play()
             TS:Create(ContentLabel, OutInfo, {TextTransparency = 1}):Play()
             TS:Create(BarBg, OutInfo, {BackgroundTransparency = 1}):Play()
