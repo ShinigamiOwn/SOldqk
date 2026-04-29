@@ -1386,132 +1386,167 @@ function Library:CreateWindow(Settings)
         end
         
         local ImageUrl = Config.ImageID or "rbxassetid://3944703587"
+        local hasIcon = ImageUrl ~= ""
 
-        local ContentSize = TxtS:GetTextSize(Content, 13, Library.GlobalFont, Vector2.new(230, 1000))
-        local TotalHeight = math.max(70, 55 + ContentSize.Y)
+        local textXOffset = hasIcon and 50 or 15
+        local textWidth = 320 - textXOffset - 15
+        local textSize = TxtS:GetTextSize(Content, 14, Library.GlobalFont, Vector2.new(textWidth, 9999))
+        local TotalHeight = math.max(hasIcon and 50 or 40, textSize.Y + 44)
 
         local NotifHolder = Create("Frame", {
             Parent = NotifContainer,
-            Size = UDim2.new(1, 0, 0, 0),
+            Size = UDim2.new(1, 0, 0, TotalHeight),
             BackgroundTransparency = 1,
-            ClipsDescendants = false 
+            ClipsDescendants = true,
+            LayoutOrder = -math.floor(tick() * 1000)
         })
         
         local Frame = Create("Frame", {
             Parent = NotifHolder,
-            Size = UDim2.fromScale(1, 1),
+            Size = UDim2.new(1, 0, 1, 0),
+            Position = UDim2.new(1, 400, 0, 0),
             BackgroundColor3 = SelectedTheme.Main,
             BackgroundTransparency = 1,
             ZIndex = 10001,
             ClipsDescendants = true,
             ThemeTag = "Main"
         })
-        AddCorner(Frame, 10)
         
-        local Stroke = AddStroke(Frame, SelectedTheme)
-        Stroke.Transparency = 1 
+        do -- Corner and Stroke
+            AddCorner(Frame, 10)
+            local Stroke = AddStroke(Frame, SelectedTheme)
+            Stroke.Transparency = 1
+        end
 
-        local Shadow = CreateDropShadow(NotifHolder, 45, 0)
-        Shadow.ImageTransparency = 1
+        do -- Shadow
+            local Shadow = CreateDropShadow(NotifHolder, 35, 0)
+            Shadow.ImageTransparency = 1
+        end
         
-        local Icon = Create("ImageLabel", {
-            Parent = Frame,
-            Size = UDim2.new(0, 0, 0, 0),
-            Position = UDim2.new(0, 31, 0, 31),
-            BackgroundTransparency = 1,
-            ImageColor3 = Color3.fromRGB(255, 255, 255),
-            ZIndex = 10002,
-            ImageTransparency = 1,
-            Rotation = -15
-        })
-        SetImageAsync(Icon, "Image", ImageUrl)
+        do -- Icon
+            if hasIcon then
+                local Icon = Create("ImageLabel", {
+                    Parent = Frame,
+                    Size = UDim2.new(0, 26, 0, 26),
+                    Position = UDim2.new(0, 12, 0, 12),
+                    BackgroundTransparency = 1,
+                    ImageColor3 = Color3.fromRGB(255, 255, 255),
+                    ZIndex = 10002,
+                    ImageTransparency = 1
+                })
+                SetImageAsync(Icon, "Image", ImageUrl)
+            end
+        end
         
-        local TitleLabel = Create("TextLabel", {
-            Parent = Frame,
-            Size = UDim2.new(1, -64, 0, 20),
-            Position = UDim2.new(0, 60, 0, 12),
-            BackgroundTransparency = 1,
-            Text = Title,
-            Font = Library.GlobalFontBold,
-            TextColor3 = SelectedTheme.Text,
-            TextSize = 15,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            ZIndex = 10002,
-            TextTransparency = 1,
-            ThemeTag = "Text"
-        })
+        do -- Title Label
+            local TitleLabel = Create("TextLabel", {
+                Parent = Frame,
+                Size = UDim2.new(1, -textXOffset - 15, 0, 16),
+                Position = UDim2.new(0, textXOffset, 0, 10),
+                BackgroundTransparency = 1,
+                Text = Title,
+                Font = Library.GlobalFontBold,
+                TextColor3 = SelectedTheme.Text,
+                TextSize = 15,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                ZIndex = 10002,
+                TextTransparency = 1,
+                ThemeTag = "Text"
+            })
+        end
         
-        local ContentLabel = Create("TextLabel", {
-            Parent = Frame,
-            Size = UDim2.new(1, -64, 1, -34),
-            Position = UDim2.new(0, 60, 0, 34),
-            BackgroundTransparency = 1,
-            Text = Content,
-            Font = Library.GlobalFont,
-            TextColor3 = SelectedTheme.TextDark,
-            TextSize = 13,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Top,
-            ZIndex = 10002,
-            TextWrapped = true,
-            TextTransparency = 1,
-            ThemeTag = "TextDark"
-        })
+        do -- Content Label
+            local ContentLabel = Create("TextLabel", {
+                Parent = Frame,
+                Size = UDim2.new(1, -textXOffset - 15, 1, -30),
+                Position = UDim2.new(0, textXOffset, 0, 28),
+                BackgroundTransparency = 1,
+                Text = Content,
+                Font = Library.GlobalFont,
+                TextColor3 = SelectedTheme.TextDark,
+                TextSize = 14,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextYAlignment = Enum.TextYAlignment.Top,
+                ZIndex = 10002,
+                TextWrapped = true,
+                TextTransparency = 1,
+                ThemeTag = "TextDark"
+            })
+        end
 
-        local BarBg = Create("Frame", {
-            Parent = Frame,
-            Size = UDim2.new(1, -28, 0, 3),
-            Position = UDim2.new(0, 14, 1, -8),
-            BackgroundColor3 = SelectedTheme.Second,
-            BorderSizePixel = 0,
-            ZIndex = 10002,
-            BackgroundTransparency = 1,
-            ThemeTag = "Second"
-        })
-        AddCorner(BarBg, 3)
-        
-        local Bar = Create("Frame", {
-            Parent = BarBg,
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundColor3 = SelectedTheme.ElementAccent,
-            BorderSizePixel = 0,
-            ZIndex = 10003,
-            BackgroundTransparency = 1,
-            ThemeTag = "ElementAccent"
-        })
-        AddCorner(Bar, 3)
-        
-        local InInfo = TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-        local LinearInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-        
-        TS:Create(NotifHolder, InInfo, {Size = UDim2.new(1, 0, 0, TotalHeight)}):Play()
-        TS:Create(Frame, LinearInfo, {BackgroundTransparency = 0.15}):Play()
-        TS:Create(Stroke, LinearInfo, {Transparency = 0.4}):Play()
-        TS:Create(Shadow, LinearInfo, {ImageTransparency = 0.35}):Play()
-        TS:Create(Icon, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 38, 0, 38), Position = UDim2.new(0, 12, 0, 12), ImageTransparency = 0, Rotation = 0}):Play()
-        TS:Create(TitleLabel, LinearInfo, {TextTransparency = 0}):Play()
-        TS:Create(ContentLabel, LinearInfo, {TextTransparency = 0}):Play()
-        TS:Create(BarBg, LinearInfo, {BackgroundTransparency = 0.5}):Play()
-        TS:Create(Bar, LinearInfo, {BackgroundTransparency = 0}):Play()
-        
-        local TimerTween = TS:Create(Bar, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
-        TimerTween:Play()
-        
-        TimerTween.Completed:Connect(function()
-            local OutInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
-            TS:Create(NotifHolder, OutInfo, {Size = UDim2.new(1, 0, 0, 0)}):Play()
-            TS:Create(Frame, OutInfo, {BackgroundTransparency = 1}):Play()
-            TS:Create(Stroke, OutInfo, {Transparency = 1}):Play()
-            TS:Create(Shadow, OutInfo, {ImageTransparency = 1}):Play()
-            TS:Create(Icon, OutInfo, {ImageTransparency = 1, Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0, 31, 0, 31)}):Play()
-            TS:Create(TitleLabel, OutInfo, {TextTransparency = 1}):Play()
-            TS:Create(ContentLabel, OutInfo, {TextTransparency = 1}):Play()
-            TS:Create(BarBg, OutInfo, {BackgroundTransparency = 1}):Play()
-            TS:Create(Bar, OutInfo, {BackgroundTransparency = 1}):Play()
-            task.delay(0.5, function()
-                NotifHolder:Destroy()
-            end)
-        end)
+        do -- Time Bar
+            local TimeBarBg = Create("Frame", {
+                Parent = Frame,
+                Size = UDim2.new(1, -20, 0, 2),
+                Position = UDim2.new(0, 10, 1, -8),
+                BackgroundColor3 = SelectedTheme.Stroke or SelectedTheme.TextDark,
+                BorderSizePixel = 0,
+                ZIndex = 10002,
+                BackgroundTransparency = 1,
+                ThemeTag = "TextDark"
+            })
+            AddCorner(TimeBarBg, 2)
+            
+            local TimeBar = Create("Frame", {
+                Parent = TimeBarBg,
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundColor3 = SelectedTheme.ElementAccent,
+                BorderSizePixel = 0,
+                ZIndex = 10003,
+                BackgroundTransparency = 1,
+                ThemeTag = "ElementAccent"
+            })
+            AddCorner(TimeBar, 2)
+            
+            do -- Animations
+                local InInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                local LinearInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                
+                TS:Create(NotifHolder, InInfo, {Size = UDim2.new(1, 0, 0, TotalHeight)}):Play()
+                TS:Create(Frame, LinearInfo, {BackgroundTransparency = 0.15, Position = UDim2.new(0, 0, 0, 0)}):Play()
+                
+                local Stroke = Frame:FindFirstChildOfClass("UIStroke")
+                if Stroke then
+                    TS:Create(Stroke, LinearInfo, {Transparency = 0.4}):Play()
+                end
+                
+                local Shadow = NotifHolder:FindFirstChildWhichIsA("ImageLabel")
+                if Shadow then
+                    TS:Create(Shadow, LinearInfo, {ImageTransparency = 0.35}):Play()
+                end
+                
+                local Icon = Frame:FindFirstChildOfClass("ImageLabel")
+                if Icon then
+                    TS:Create(Icon, LinearInfo, {ImageTransparency = 0}):Play()
+                end
+                
+                local TitleLabel = Frame:FindFirstChildOfClass("TextLabel")
+                if TitleLabel then
+                    TS:Create(TitleLabel, LinearInfo, {TextTransparency = 0}):Play()
+                end
+                
+                local ContentLabel = Frame:FindFirstChildOfClass("TextLabel", true)
+                if ContentLabel and ContentLabel ~= TitleLabel then
+                    TS:Create(ContentLabel, LinearInfo, {TextTransparency = 0}):Play()
+                end
+                
+                TS:Create(TimeBarBg, LinearInfo, {BackgroundTransparency = 0.5}):Play()
+                TS:Create(TimeBar, LinearInfo, {BackgroundTransparency = 0}):Play()
+                
+                do -- Timer
+                    local TimerTween = TS:Create(TimeBar, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
+                    TimerTween:Play()
+                    
+                    TimerTween.Completed:Connect(function()
+                        local OutInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
+                        TS:Create(Frame, OutInfo, {Position = UDim2.new(1, 400, 0, 0)}):Play()
+                        task.delay(0.4, function()
+                            NotifHolder:Destroy()
+                        end)
+                    end)
+                end
+            end
+        end
     end
 
     local VP = workspace.CurrentCamera.ViewportSize
