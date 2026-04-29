@@ -1406,16 +1406,20 @@ function Library:CreateWindow(Settings)
             Size = UDim2.new(1, 0, 1, 0),
             Position = UDim2.new(1, 400, 0, 0),
             BackgroundColor3 = SelectedTheme.Main,
-            BackgroundTransparency = 1,
+            BackgroundTransparency = 0, -- Полностью непрозрачный
             ZIndex = 10001,
             ClipsDescendants = true,
             ThemeTag = "Main"
         })
         
-        do -- Corner and Stroke
-            AddCorner(Frame, 10)
+        do -- Corner and Stroke (более квадратный)
+            local Corner = Instance.new("UICorner")
+            Corner.CornerRadius = UDim.new(0, 4) -- Маленький радиус 4px вместо 10
+            Corner.Parent = Frame
+            
             local Stroke = AddStroke(Frame, SelectedTheme)
             Stroke.Transparency = 1
+            Stroke.Thickness = 1.5
         end
 
         do -- Shadow
@@ -1477,15 +1481,18 @@ function Library:CreateWindow(Settings)
         do -- Time Bar
             local TimeBarBg = Create("Frame", {
                 Parent = Frame,
-                Size = UDim2.new(1, -20, 0, 2),
-                Position = UDim2.new(0, 10, 1, -8),
+                Size = UDim2.new(1, -20, 0, 3), -- Чуть толще полоска
+                Position = UDim2.new(0, 10, 1, -10),
                 BackgroundColor3 = SelectedTheme.Stroke or SelectedTheme.TextDark,
                 BorderSizePixel = 0,
                 ZIndex = 10002,
-                BackgroundTransparency = 1,
+                BackgroundTransparency = 0.3,
                 ThemeTag = "TextDark"
             })
-            AddCorner(TimeBarBg, 2)
+            
+            local Corner = Instance.new("UICorner")
+            Corner.CornerRadius = UDim.new(0, 2)
+            Corner.Parent = TimeBarBg
             
             local TimeBar = Create("Frame", {
                 Parent = TimeBarBg,
@@ -1493,26 +1500,29 @@ function Library:CreateWindow(Settings)
                 BackgroundColor3 = SelectedTheme.ElementAccent,
                 BorderSizePixel = 0,
                 ZIndex = 10003,
-                BackgroundTransparency = 1,
+                BackgroundTransparency = 0,
                 ThemeTag = "ElementAccent"
             })
-            AddCorner(TimeBar, 2)
+            
+            local TimeBarCorner = Instance.new("UICorner")
+            TimeBarCorner.CornerRadius = UDim.new(0, 2)
+            TimeBarCorner.Parent = TimeBar
             
             do -- Animations
                 local InInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-                local LinearInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                local LinearInfo = TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
                 
                 TS:Create(NotifHolder, InInfo, {Size = UDim2.new(1, 0, 0, TotalHeight)}):Play()
-                TS:Create(Frame, LinearInfo, {BackgroundTransparency = 0.15, Position = UDim2.new(0, 0, 0, 0)}):Play()
+                TS:Create(Frame, LinearInfo, {Position = UDim2.new(0, 0, 0, 0)}):Play()
                 
                 local Stroke = Frame:FindFirstChildOfClass("UIStroke")
                 if Stroke then
-                    TS:Create(Stroke, LinearInfo, {Transparency = 0.4}):Play()
+                    TS:Create(Stroke, LinearInfo, {Transparency = 0.3}):Play()
                 end
                 
                 local Shadow = NotifHolder:FindFirstChildWhichIsA("ImageLabel")
                 if Shadow then
-                    TS:Create(Shadow, LinearInfo, {ImageTransparency = 0.35}):Play()
+                    TS:Create(Shadow, LinearInfo, {ImageTransparency = 0.25}):Play()
                 end
                 
                 local Icon = Frame:FindFirstChildOfClass("ImageLabel")
@@ -1530,8 +1540,7 @@ function Library:CreateWindow(Settings)
                     TS:Create(ContentLabel, LinearInfo, {TextTransparency = 0}):Play()
                 end
                 
-                TS:Create(TimeBarBg, LinearInfo, {BackgroundTransparency = 0.5}):Play()
-                TS:Create(TimeBar, LinearInfo, {BackgroundTransparency = 0}):Play()
+                TS:Create(TimeBarBg, LinearInfo, {BackgroundTransparency = 0}):Play()
                 
                 do -- Timer
                     local TimerTween = TS:Create(TimeBar, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
