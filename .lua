@@ -1406,25 +1406,21 @@ function Library:CreateWindow(Settings)
             Size = UDim2.new(1, 0, 1, 0),
             Position = UDim2.new(1, 400, 0, 0),
             BackgroundColor3 = SelectedTheme.Main,
-            BackgroundTransparency = 0, -- Полностью непрозрачный
+            BackgroundTransparency = 0, -- ✅ убрали прозрачность
             ZIndex = 10001,
             ClipsDescendants = true,
             ThemeTag = "Main"
         })
         
-        do -- Corner and Stroke (более квадратный)
-            local Corner = Instance.new("UICorner")
-            Corner.CornerRadius = UDim.new(0, 4) -- Маленький радиус 4px вместо 10
-            Corner.Parent = Frame
-            
+        do -- Corner and Stroke
+            AddCorner(Frame, 3) -- ✅ почти квадрат
             local Stroke = AddStroke(Frame, SelectedTheme)
-            Stroke.Transparency = 1
-            Stroke.Thickness = 1.5
+            Stroke.Transparency = 0.2 -- чуть видимый бордер
         end
 
         do -- Shadow
             local Shadow = CreateDropShadow(NotifHolder, 35, 0)
-            Shadow.ImageTransparency = 1
+            Shadow.ImageTransparency = 0.5
         end
         
         do -- Icon
@@ -1436,14 +1432,14 @@ function Library:CreateWindow(Settings)
                     BackgroundTransparency = 1,
                     ImageColor3 = Color3.fromRGB(255, 255, 255),
                     ZIndex = 10002,
-                    ImageTransparency = 1
+                    ImageTransparency = 0
                 })
                 SetImageAsync(Icon, "Image", ImageUrl)
             end
         end
         
         do -- Title Label
-            local TitleLabel = Create("TextLabel", {
+            Create("TextLabel", {
                 Parent = Frame,
                 Size = UDim2.new(1, -textXOffset - 15, 0, 16),
                 Position = UDim2.new(0, textXOffset, 0, 10),
@@ -1454,13 +1450,13 @@ function Library:CreateWindow(Settings)
                 TextSize = 15,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 ZIndex = 10002,
-                TextTransparency = 1,
+                TextTransparency = 0,
                 ThemeTag = "Text"
             })
         end
         
         do -- Content Label
-            local ContentLabel = Create("TextLabel", {
+            Create("TextLabel", {
                 Parent = Frame,
                 Size = UDim2.new(1, -textXOffset - 15, 1, -30),
                 Position = UDim2.new(0, textXOffset, 0, 28),
@@ -1473,7 +1469,7 @@ function Library:CreateWindow(Settings)
                 TextYAlignment = Enum.TextYAlignment.Top,
                 ZIndex = 10002,
                 TextWrapped = true,
-                TextTransparency = 1,
+                TextTransparency = 0,
                 ThemeTag = "TextDark"
             })
         end
@@ -1481,18 +1477,15 @@ function Library:CreateWindow(Settings)
         do -- Time Bar
             local TimeBarBg = Create("Frame", {
                 Parent = Frame,
-                Size = UDim2.new(1, -20, 0, 3), -- Чуть толще полоска
-                Position = UDim2.new(0, 10, 1, -10),
+                Size = UDim2.new(1, -20, 0, 2),
+                Position = UDim2.new(0, 10, 1, -8),
                 BackgroundColor3 = SelectedTheme.Stroke or SelectedTheme.TextDark,
                 BorderSizePixel = 0,
                 ZIndex = 10002,
                 BackgroundTransparency = 0.3,
                 ThemeTag = "TextDark"
             })
-            
-            local Corner = Instance.new("UICorner")
-            Corner.CornerRadius = UDim.new(0, 2)
-            Corner.Parent = TimeBarBg
+            AddCorner(TimeBarBg, 2)
             
             local TimeBar = Create("Frame", {
                 Parent = TimeBarBg,
@@ -1503,58 +1496,21 @@ function Library:CreateWindow(Settings)
                 BackgroundTransparency = 0,
                 ThemeTag = "ElementAccent"
             })
+            AddCorner(TimeBar, 2)
             
-            local TimeBarCorner = Instance.new("UICorner")
-            TimeBarCorner.CornerRadius = UDim.new(0, 2)
-            TimeBarCorner.Parent = TimeBar
+            local TimerTween = TS:Create(TimeBar, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {
+                Size = UDim2.new(0, 0, 1, 0)
+            })
+            TimerTween:Play()
             
-            do -- Animations
-                local InInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-                local LinearInfo = TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-                
-                TS:Create(NotifHolder, InInfo, {Size = UDim2.new(1, 0, 0, TotalHeight)}):Play()
-                TS:Create(Frame, LinearInfo, {Position = UDim2.new(0, 0, 0, 0)}):Play()
-                
-                local Stroke = Frame:FindFirstChildOfClass("UIStroke")
-                if Stroke then
-                    TS:Create(Stroke, LinearInfo, {Transparency = 0.3}):Play()
-                end
-                
-                local Shadow = NotifHolder:FindFirstChildWhichIsA("ImageLabel")
-                if Shadow then
-                    TS:Create(Shadow, LinearInfo, {ImageTransparency = 0.25}):Play()
-                end
-                
-                local Icon = Frame:FindFirstChildOfClass("ImageLabel")
-                if Icon then
-                    TS:Create(Icon, LinearInfo, {ImageTransparency = 0}):Play()
-                end
-                
-                local TitleLabel = Frame:FindFirstChildOfClass("TextLabel")
-                if TitleLabel then
-                    TS:Create(TitleLabel, LinearInfo, {TextTransparency = 0}):Play()
-                end
-                
-                local ContentLabel = Frame:FindFirstChildOfClass("TextLabel", true)
-                if ContentLabel and ContentLabel ~= TitleLabel then
-                    TS:Create(ContentLabel, LinearInfo, {TextTransparency = 0}):Play()
-                end
-                
-                TS:Create(TimeBarBg, LinearInfo, {BackgroundTransparency = 0}):Play()
-                
-                do -- Timer
-                    local TimerTween = TS:Create(TimeBar, TweenInfo.new(Duration, Enum.EasingStyle.Linear), {Size = UDim2.new(0, 0, 1, 0)})
-                    TimerTween:Play()
-                    
-                    TimerTween.Completed:Connect(function()
-                        local OutInfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
-                        TS:Create(Frame, OutInfo, {Position = UDim2.new(1, 400, 0, 0)}):Play()
-                        task.delay(0.4, function()
-                            NotifHolder:Destroy()
-                        end)
-                    end)
-                end
-            end
+            TimerTween.Completed:Connect(function()
+                TS:Create(Frame, TweenInfo.new(0.3), {
+                    Position = UDim2.new(1, 400, 0, 0)
+                }):Play()
+                task.delay(0.3, function()
+                    NotifHolder:Destroy()
+                end)
+            end)
         end
     end
 
